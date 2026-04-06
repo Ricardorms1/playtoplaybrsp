@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>SNES Online PRO</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+background:#000;
+color:white;
+text-align:center;
+font-family:Arial;
+margin:0;
+}
+
+#game{
+width:100%;
+max-width:900px;
+height:600px;
+margin:auto;
+margin-top:20px;
+border:3px solid #00ffcc;
+}
+
+button{
+padding:10px 20px;
+font-size:18px;
+margin-top:10px;
+cursor:pointer;
+background:#00ffcc;
+border:none;
+}
+
+button:hover{
+background:#00ccaa;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🎮 SNES Emulator Online</h1>
+
+<input type="file" id="romInput" accept=".smc,.sfc">
+
+<br><br>
+
+<button onclick="executarJogo()">▶ EXECUTAR</button>
+
+<div id="game"></div>
+
+<script>
+
+let romURL = null;
+
+document.getElementById("romInput").addEventListener("change", function(e){
+
+const file = e.target.files[0];
+if(!file){
+alert("Selecione uma ROM primeiro.");
+return;
+}
+
+const reader = new FileReader();
+
+reader.onload = function(){
+
+const blob = new Blob([reader.result]);
+romURL = URL.createObjectURL(blob);
+
+alert("ROM carregada. Conecte o controle e clique em EXECUTAR.");
+
+};
+
+reader.readAsArrayBuffer(file);
+
+});
+
+
+function executarJogo(){
+
+if(!romURL){
+alert("Primeiro carregue uma ROM.");
+return;
+}
+
+document.getElementById("game").innerHTML = "";
+
+window.EJS_player = "#game";
+window.EJS_core = "snes";
+window.EJS_gameUrl = romURL;
+window.EJS_pathtodata = "https://cdn.emulatorjs.org/stable/data/";
+
+/* 🔥 ATIVAR GAMEPAD AUTOMÁTICO */
+window.EJS_gamepad = true;
+window.EJS_Buttons = {
+    0: { // Player 1
+        A: 0,
+        B: 1,
+        X: 2,
+        Y: 3,
+        L: 4,
+        R: 5,
+        SELECT: 8,
+        START: 9,
+        UP: 12,
+        DOWN: 13,
+        LEFT: 14,
+        RIGHT: 15
+    }
+};
+
+const script = document.createElement("script");
+script.src = "https://cdn.emulatorjs.org/stable/data/loader.js";
+
+document.body.appendChild(script);
+
+}
+
+/* Detecta automaticamente quando conectar controle */
+window.addEventListener("gamepadconnected", function(e){
+console.log("Controle conectado:", e.gamepad.id);
+alert("Controle detectado automaticamente!");
+});
+
+</script>
+
+</body>
+</html>
